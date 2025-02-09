@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accurate Location Finder</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            border: 2px solid #000;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to My Django App</h1>
+    <p>Click the button to detect your precise location:</p>
+    <button onclick="getAccurateLocation()">Get My Location 📍</button>
+
+    <h2>Your Location Details:</h2>
+    <ul id="location-details">
+        <li><strong>IP-Based City:</strong> {{ city }}</li>
+        <li><strong>IP-Based Region:</strong> {{ region }}</li>
+        <li><strong>IP-Based Country:</strong> {{ country }}</li>
+    </ul>
+
+    <!-- Map Display -->
+    <div id="map"></div>
+
+    <!-- Geolocation Script -->
+    <script>
+        function getAccurateLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Display Coordinates
+            const details = document.getElementById("location-details");
+            details.innerHTML += `<li><strong>Accurate Latitude:</strong> ${lat}</li>`;
+            details.innerHTML += `<li><strong>Accurate Longitude:</strong> ${lon}</li>`;
+
+            // Google Maps
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: { lat, lng: lon },
+            });
+
+            new google.maps.Marker({
+                position: { lat, lng: lon },
+                map: map,
+                title: "Your Accurate Location",
+            });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+
+    <!-- Google Maps API -->
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY">
+    </script>
+</body>
+
+</html>
